@@ -17,7 +17,7 @@ void fill_board()
                 board[y * columns + x] = '#';
             }
             else
-            board[y*columns+x]=' ';
+            board[y*columns+x]=' ';//for space
         }
     }
 }
