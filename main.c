@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <conio.h>
 #include <stdlib.h>
+#define SNAKE_MAX_LEN 256
 #define rows 20
 #define columns 20
 
@@ -40,9 +41,21 @@ void print_board()
 struct snake_Part{
     int x,y;
 };
-struct snake{
+struct Snake{
     int length;
+    struct snake_Part part[SNAKE_MAX_LEN];
 };
+struct Snake snake;
+void draw_snake() {
+    int i;
+    
+    for(i=snake.length-1; i>0; i--) {
+        board[snake.part[i].y*columns + snake.part[i].x] = '*';
+    }
+    board[snake.part[0].y*columns + snake.part[0].x] = '0';
+}
+
+
 void draw_snake(){
     board[snakeX* columns + snakeY]='O';
 }
@@ -64,6 +77,7 @@ switch (ch){
 int main()
 {
     while(!isGameover){
+    snake_body();
     fill_board();
     draw_snake();
     print_board();
