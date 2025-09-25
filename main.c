@@ -1,173 +1,164 @@
-// Copyright EightSprites.
-// Live coding available at: https://www.youtube.com/watch?v=t3y2b2_moY8
-// This file is put in public domain.
-// You can use it as you like.
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <conio.h>
-#include <time.h>
-
-#define cols 25
-#define rows 25
-#define foods 50
-
-char board[cols * rows];
-
-int isGameOver = 0;
-
-void fill_board() {
-    int x,y;
-    
-    for(y=0; y<rows; y++) {
-        for(x=0; x<cols; x++) {
-            if(x==0||y==0||x==cols-1||y==rows-1) {
-                board[y*cols + x] = '#';
-            }else{
-                board[y*cols + x] = ' ';
-            }
-        }
-    }
-}
-
-void clear_screen() {
-    // Hack clear screen on Windows. Do not use!
-    system("cls");
-    // on Linux & MAC
-    // system("clear");
-}
-
-void print_board() {
-    int x,y;
-        
-    for(y=0; y<rows; y++) {
-        for(x=0; x<cols; x++) {
-            putch(board[y*cols + x]);
-        }
-        putch('\n');
-    }    
-}
-
 #define SNAKE_MAX_LEN 256
-struct SnakePart {
-    int x, y;
-};
-struct Snake {
-    int length;
-    struct SnakePart part[SNAKE_MAX_LEN];
-};
-struct Snake snake;
+#define columns 50
+#define rows 25
+#define apples 50
+char board[rows*columns];
+int is_game_over=0;
 
-struct Food {
-    int x, y;
-    int consumed;
-};
-struct Food food[foods];
+void clear_screen(){
+    system("cls");
+}
+void make_board()//to fill the 1D array which act as a game board
+{
 
-void draw_snake() {
-    int i;
-    
-    for(i=snake.length-1; i>0; i--) {
-        board[snake.part[i].y*cols + snake.part[i].x] = '*';
+    int i,j;
+    for(i=0;i<rows;i++){
+        for(j=0;j<columns;j++){
+            if (i==0||j==0||i==rows-1||j==columns-1) //to append the # at borders only because it will be at eh ends of the iterations                    
+            board[i*columns+j]='#';                  //(i*columns+j) used because the it will force loop to append the characers rows wise 
+            else                                      // because i*columns will help skip the previous already elements in the array                      
+            board[i*columns+j]=' ';                                         
+        }
     }
-    board[snake.part[0].y*cols + snake.part[0].x] = '@';
 }
 
-void move_snake(int deltaX, int deltaY) {
-    int i;
+void show_board()//To display the game board on the console
+{
+       int i,j;
 
-    for(i=snake.length-1; i>0; i--) {
-        snake.part[i] = snake.part[i-1];
+    for(i=0;i<rows;i++){
+        for(j=0;j<columns;j++){
+            putchar(board[i*columns+j]);;//simply using putchar because best for showing single character at a timee
+        }putchar('\n');
     }
-    
-    snake.part[0].x += deltaX;
-    snake.part[0].y += deltaY;
 }
 
+struct Snake_body_part//It will used to make each body part of the snake and represent it as a point like (x,y) 
+{
+    int x,y;//used two int variable make them act as coordinate points for the body parts
+};
+
+struct Snake// It will be used to make whole snake 
+{
+    int length;// this member will store the total length of the snake 
+                // total length= head + body
+                //tells you how many elements of the array part[] are actually being used.
+    struct Snake_body_part Part[SNAKE_MAX_LEN];//
+                                        // here we are declaring a array named 'part' 
+                                        //which is of data type Snake_part  
+                                        //length is 256 
+                                        //possible body parts of the snake 
+};
+
+struct Snake snake_in_game;
+
+struct Apple
+{
+    int x,y;    //This struct will help us label the coordinates/position of the apple in the array
+    int eaten;  // will tell the dev whether the apple at the previous defined coordinates is eaten or not
+                // eaten = 0
+                // not eaten = 1
+                //used struct because it will tell the coordinate and state of the each apple
+};
+
+struct Apple apple_in_game[apples];//this statement will help us store each apple and apples in the size will help us not make more apple than desired
+
+void draw_snake()
+{
+    int i;
+    for (i=snake_in_game.length-1;i>0;i--){
+                                    //this will run a loop which will print the body part of the snake
+                                // also the the snake start to form from it's tail not it's head thats why i=snake_in_game.length-1 and not i=0
+        board[snake_in_game.Part[i].y*columns+snake_in_game.Part[i].x]='o';}//this logic is being used because it is a 1D array
+        
+        board[snake_in_game.Part[0].y*columns+snake_in_game.Part[0].x]='0';//this print head evry time draw_snake is called
+}
+
+void snake_move(int DirX,int DirY)
+{
+    int i;
+    for (i=snake_in_game.length-1;i>0;i--){
+        snake_in_game.Part[i]=snake_in_game.Part[i-1];    
+    }
+    snake_in_game.Part[0].x+=DirX;/*these two statement are used to tunr the head of tehe snake to the desired place*/
+    snake_in_game.Part[0].y+=DirY;
+}
 void read_keyboard() {
     int ch = getch();
     
     switch(ch) {
-        case 'w': move_snake( 0,-1); break;
-        case 's': move_snake( 0, 1); break;
-        case 'a': move_snake(-1, 0); break;
-        case 'd': move_snake( 1, 0); break;        
+        case'W':
+        case 72:
+        case 'w': snake_move( 0,-1); break;
+        case 80:
+        case 'S':
+        case 's': snake_move( 0, 1); break;
+        case 75:
+        case 'A':
+        case 'a': snake_move(-1, 0); break;
+        case 'D':
+        case 77:
+        case 'd': snake_move( 1, 0); break;        
     }
 }
 
-void draw_food() {
+void draw_apples(){
     int i;
-    
-    for(i=0; i<foods; i++) {
-        if( !food[i].consumed ) {
-            board[food[i].y*cols + food[i].x] = '+';
-        }
+    for(i=0;i<apples;i++){
+        if(!apple_in_game[i].eaten)
+        board[apple_in_game[i].y*columns+apple_in_game[i].x]='+';
     }
 }
 
-void setup_food() {
+void setup_apple()
+{
     int i;
-    
-    for(i=0; i<foods; i++) {
-        food[i].x = 1 + rand() % (cols-2);
-        food[i].y = 1 + rand() % (rows-2);
-        food[i].consumed = 0;
-    }
+    for (i=0;i<apples;i++){
+    apple_in_game[i].x=1+rand()%(columns-2);
+    apple_in_game[i].y=1+rand()%(rows-2);
+    apple_in_game[i].eaten=0;
+}}
+
+void setup_snake(){
+    snake_in_game.length=1;
+    snake_in_game.Part[0].x=1+rand()%(columns-2);
+    snake_in_game.Part[0].y=1+rand()%(rows-2);
 }
 
-void setup_snake() {
-    snake.length = 1;
-    snake.part[0].x = 1 + rand() % (cols-2);
-    snake.part[0].y = 1 + rand() % (rows-2);
-}
-
-void game_rules() {
+void game_setup(){
     int i;
-    
-    for(i=0; i<foods; i++) {
-        if( !food[i].consumed ) {
-            if( food[i].x == snake.part[0].x &&
-                food[i].y == snake.part[0].y ) {
-                    food[i].consumed = 1;
-                    snake.length++;
-            }
+    for (i=0;i<apples;i++){
+        if(!apple_in_game[i].eaten){
+            if((apple_in_game[i].x==snake_in_game.Part[0].x)&&(apple_in_game[i].y==snake_in_game.Part[0].y)){
+             apple_in_game[i].eaten=1;
+             snake_in_game.length++;}
         }
-    }
-    
-    if( snake.part[0].x == 0 || snake.part[0].x == cols-1 ||
-        snake.part[0].y == 0 || snake.part[0].y == rows-1 ) {
-            isGameOver = 1;
-    }
-    
-    for(i=1; i<snake.length; i++) {
-        if( snake.part[0].x == snake.part[i].x &&
-            snake.part[0].y == snake.part[i].y ) {
-                isGameOver = 1;
-        }
-    }
-}
 
-int main(int argc, char **argv)
-{   
-    srand(time(0));
-    
-    setup_snake();
-    setup_food();
-    
-    while(!isGameOver) {
-        fill_board();
-        draw_food();
-        draw_snake();
-        game_rules();
-        clear_screen();
-        printf("Snake Game, Score: %d\n", snake.length * 100);
-        print_board();
-        if( !isGameOver ) read_keyboard();
     }
-    
-    printf("Game Over, Final score: %d\n", snake.length * 100);
-    
-    while(1) getch();
-    
-	return 0;
+    if(snake_in_game.Part[0].x==0||snake_in_game.Part[0].x==columns-1||snake_in_game.Part[0].y==0||snake_in_game.Part[0].y==rows-1){
+    is_game_over=1;}
+
+    for(i=1;i<snake_in_game.length;i++){
+        if(snake_in_game.Part[0].x==snake_in_game.Part[i].x&&snake_in_game.Part[0].y==snake_in_game.Part[i].y){
+        is_game_over=1;}
+
+    }   
+}
+int main(int argc, char **argv){
+
+setup_snake();
+setup_apple();
+while (!is_game_over) {
+    make_board();
+    draw_apples();
+    draw_snake();
+    clear_screen();
+    show_board();
+    read_keyboard();
+    game_setup();
+}
+    return 0;
 }
