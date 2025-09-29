@@ -1,15 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <conio.h>
+#include <time.h>
 #define SNAKE_MAX_LEN 256
 #define columns 50
 #define rows 25
 #define apples 50
-char board[rows*columns];
-int is_game_over=0;
+char board[rows*columns];//1D to that will become the game board
+int is_game_over=0;// to track if the game is over
 
 void clear_screen(){
-    system("cls");
+    system("cls");// the cls is onlyused for windows so for linux or mac make use clear command
 }
 void make_board()//to fill the 1D array which act as a game board
 {
@@ -66,7 +67,7 @@ struct Apple
 
 struct Apple apple_in_game[apples];//this statement will help us store each apple and apples in the size will help us not make more apple than desired
 
-void draw_snake()
+void draw_snake()// this will draw the snake from tail to the head
 {
     int i;
     for (i=snake_in_game.length-1;i>0;i--){
@@ -76,11 +77,11 @@ void draw_snake()
         
         board[snake_in_game.Part[0].y*columns+snake_in_game.Part[0].x]='0';//this print head evry time draw_snake is called
 }
-
+// Moves the snake in the specified direction (DirX, DirY)
 void snake_move(int DirX,int DirY)
 {
     int i;
-    for (i=snake_in_game.length-1;i>0;i--){
+    for (i=snake_in_game.length-1;i>0;i--){//will shift the body part to follow his head
         snake_in_game.Part[i]=snake_in_game.Part[i-1];    
     }
     snake_in_game.Part[0].x+=DirX;/*these two statement are used to tunr the head of tehe snake to the desired place*/
@@ -130,35 +131,39 @@ void setup_snake(){
 
 void game_setup(){
     int i;
-    for (i=0;i<apples;i++){
+    for (i=0;i<apples;i++){//check whether snake collided/eaten the apple with its head
         if(!apple_in_game[i].eaten){
             if((apple_in_game[i].x==snake_in_game.Part[0].x)&&(apple_in_game[i].y==snake_in_game.Part[0].y)){
              apple_in_game[i].eaten=1;
              snake_in_game.length++;}
         }
 
-    }
+    }//check collision with the wall
     if(snake_in_game.Part[0].x==0||snake_in_game.Part[0].x==columns-1||snake_in_game.Part[0].y==0||snake_in_game.Part[0].y==rows-1){
     is_game_over=1;}
 
-    for(i=1;i<snake_in_game.length;i++){
+    for(i=1;i<snake_in_game.length;i++){//check the collision with itself
         if(snake_in_game.Part[0].x==snake_in_game.Part[i].x&&snake_in_game.Part[0].y==snake_in_game.Part[i].y){
         is_game_over=1;}
 
     }   
 }
 int main(int argc, char **argv){
-
-setup_snake();
-setup_apple();
+srand(time(0));//Seed the pseudo-random number generator with the current time.
+                // Without this, rand() would produce the same sequence every run, 
+                // making the game predictable and boring.
+setup_snake();//place snake rnadomly
+setup_apple();//place apple randomly
 while (!is_game_over) {
-    make_board();
-    draw_apples();
-    draw_snake();
-    clear_screen();
-    show_board();
-    read_keyboard();
-    game_setup();
-}
+    make_board();//prepare the board
+    draw_apples();;//place apple on board
+    draw_snake();//place snake on board
+    game_setup();  //check for snake behaviour
+    clear_screen();// clear screen
+    printf("Snake game, Score %d\n",snake_in_game.length*100);
+    show_board();//print board
+    if(!is_game_over) read_keyboard();
+    
+}printf("Game Over, Final score: %d\n", snake_in_game.length * 100);
     return 0;
 }
