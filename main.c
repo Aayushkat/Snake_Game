@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <conio.h>
 #include <time.h>
+#include <windows.h>
+//#include <ncurses/ncurses.h>
 #define SNAKE_MAX_LEN 256
 #define columns 50
 #define rows 25
@@ -10,6 +12,7 @@ char board[rows*columns];//1D to that will become the game board
 int is_game_over=0;// to track if the game is over
 
 void clear_screen(){
+    //refresh();
     system("cls");// the cls is onlyused for windows so for linux or mac make use clear command
 }
 void make_board()//to fill the 1D array which act as a game board
@@ -84,26 +87,29 @@ void snake_move(int DirX,int DirY)
     for (i=snake_in_game.length-1;i>0;i--){//will shift the body part to follow his head
         snake_in_game.Part[i]=snake_in_game.Part[i-1];    
     }
-    snake_in_game.Part[0].x+=DirX;/*these two statement are used to tunr the head of tehe snake to the desired place*/
+    snake_in_game.Part[0].x+=DirX;/*these two statement are used to turn the head of the snake to the desired place*/
     snake_in_game.Part[0].y+=DirY;
 }
+static int DeltaX = 1, DeltaY = 0;
 void read_keyboard() {
     int ch = getch();
-    
+
     switch(ch) {
         case'W':
         case 72:
-        case 'w': snake_move( 0,-1); break;
+        case 'w':if (( DeltaY!=1)){ DeltaX=0;DeltaY=-1;} break;
         case 80:
         case 'S':
-        case 's': snake_move( 0, 1); break;
+        case 's':if ((DeltaY!=-1)){ DeltaX=0;DeltaY=1;} break;
         case 75:
         case 'A':
-        case 'a': snake_move(-1, 0); break;
+        case 'a':if ((DeltaX!=-1 )) {DeltaX=-1;DeltaY=0;} break;
         case 'D':
         case 77:
-        case 'd': snake_move( 1, 0); break;        
+        case 'd':if ((DeltaX!=1)) {DeltaX=1;DeltaY=0;} break;         
     }
+    snake_move(DeltaX,DeltaY);
+
 }
 
 void draw_apples(){
@@ -152,18 +158,28 @@ int main(int argc, char **argv){
 srand(time(0));//Seed the pseudo-random number generator with the current time.
                 // Without this, rand() would produce the same sequence every run, 
                 // making the game predictable and boring.
+    //initscr();
+    //noecho();
 setup_snake();//place snake rnadomly
 setup_apple();//place apple randomly
 while (!is_game_over) {
+ 
     make_board();//prepare the board
     draw_apples();;//place apple on board
     draw_snake();//place snake on board
     game_setup();  //check for snake behaviour
     clear_screen();// clear screen
+ 
     printf("Snake game, Score %d\n",snake_in_game.length*100);
     show_board();//print board
-    if(!is_game_over) read_keyboard();
+    Sleep(80);
+    if (_kbhit()) {   // check if key pressed
+        read_keyboard();
+    }
+     snake_move(DeltaX, DeltaY);
     
-}printf("Game Over, Final score: %d\n", snake_in_game.length * 100);
+}
+snake_move(columns,0);printf("Game Over, Final score: %d\n", snake_in_game.length * 100);
+while(1) getchar();
     return 0;
 }
