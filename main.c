@@ -90,7 +90,7 @@ void snake_move(int DirX,int DirY)
     snake_in_game.Part[0].x+=DirX;/*these two statement are used to turn the head of the snake to the desired place*/
     snake_in_game.Part[0].y+=DirY;
 }
-static int DeltaX = 1, DeltaY = 0;
+static int DeltaX = 0, DeltaY = 0;
 void read_keyboard() {
     int ch = getch();
 
@@ -103,10 +103,10 @@ void read_keyboard() {
         case 's':if ((DeltaY!=-1)){ DeltaX=0;DeltaY=1;} break;
         case 75:
         case 'A':
-        case 'a':if ((DeltaX!=-1 )) {DeltaX=-1;DeltaY=0;} break;
+        case 'a':if ((DeltaX!=1 )) {DeltaX=-1;DeltaY=0;} break;
         case 'D':
         case 77:
-        case 'd':if ((DeltaX!=1)) {DeltaX=1;DeltaY=0;} break;         
+        case 'd':if ((DeltaX!=-1)) {DeltaX=1;DeltaY=0;} break;         
     }
     snake_move(DeltaX,DeltaY);
 
@@ -163,7 +163,7 @@ srand(time(0));//Seed the pseudo-random number generator with the current time.
 setup_snake();//place snake rnadomly
 setup_apple();//place apple randomly
 while (!is_game_over) {
- 
+
     make_board();//prepare the board
     draw_apples();;//place apple on board
     draw_snake();//place snake on board
@@ -171,8 +171,9 @@ while (!is_game_over) {
     clear_screen();// clear screen
  
     printf("Snake game, Score %d\n",snake_in_game.length*100);
+    
     show_board();//print board
-    Sleep(80);
+     Sleep(80);
     if (_kbhit()) {   // check if key pressed
         read_keyboard();
     }
