@@ -3,9 +3,10 @@
 #include <conio.h>
 #include <time.h>
 #include <windows.h>
+#include <GL/glut.h>
 //#include <ncurses/ncurses.h>
 #define SNAKE_MAX_LEN 256
-#define columns 50
+#define columns 20
 #define rows 25
 #define apples 50
 char board[rows*columns];//1D to that will become the game board
@@ -90,11 +91,39 @@ void snake_move(int DirX,int DirY)
     snake_in_game.Part[0].x+=DirX;/*these two statement are used to turn the head of the snake to the desired place*/
     snake_in_game.Part[0].y+=DirY;
 }
-static int DeltaX = 0, DeltaY = 0;
-void read_keyboard() {
-    int ch = getch();
 
-    switch(ch) {
+void display_function(){
+    int x,y;
+    glClear(GL_COLOR_BUFFER_BIT);
+        for(y=0;y<rows;y++){
+            for(x=0:x<columns;x++){
+                int ch = board[y*columns+x];
+                float quad_x_size=2/(float)columns;
+                float quad_y_size=2/(float)rows;
+
+                switch(ch){
+                    case'#':glColor3f(0.5,0.5,0.5);break;
+                    case'0':glColor3f(1.0,0.0,0.0);break;
+                    case'o':glColor3f(1.0,0.0,0.0);break;
+                    case'+':glColor3f(0.0,1.0,0.0);break;
+                    case' ':glColor3f(0.0,0.0,0.0);break;
+                    case'#':glColor3f(0.5,0.5,0.5);break;
+
+                }
+glBegin(GL_QUADS);
+glVertex3f(quad_x_size*(x+0) -1,quad_y_size*((rows-y-1)+0)-1,0.0);
+glVertex3f(quad_x_size*(x+1) -1,quad_y_size*((rows-y-1)+0)-1,0.0);
+glVertex3f(quad_x_size*(x+1) -1,quad_y_size*((rows-y-1)+1)-1,0.0);
+glVertex3f(quad_x_size*(x+0) -1,quad_y_size*((rows-y-1)+1)-1,0.0);
+glEnd();
+            }
+        }
+}
+ int DeltaX = 0, DeltaY = 0;
+void read_keyboard(unsigned char key, int x, int y) {
+    
+
+    switch(key) {
         case'W':
         case 72:
         case 'w':if (( DeltaY!=1)){ DeltaX=0;DeltaY=-1;} break;
@@ -111,6 +140,17 @@ void read_keyboard() {
     snake_move(DeltaX,DeltaY);
 
 }
+void idleFunc(){
+    Sleep(100);
+    make_board();
+    draw_apples();
+    draw_snake();
+    game_setup();
+    if(!is_game_over){
+        snake_move(DeltaX,DeltaY);}
+        glutPostRedisplay();
+    }
+    
 
 void draw_apples(){
     int i;
@@ -154,33 +194,16 @@ void game_setup(){
 
     }   
 }
+ 
 int main(int argc, char **argv){
 srand(time(0));//Seed the pseudo-random number generator with the current time.
                 // Without this, rand() would produce the same sequence every run, 
                 // making the game predictable and boring.
     //initscr();
     //noecho();
-setup_snake();//place snake rnadomly
+setup_snake();//place snake randomly
 setup_apple();//place apple randomly
-while (!is_game_over) {
-
-    make_board();//prepare the board
-    draw_apples();;//place apple on board
-    draw_snake();//place snake on board
-    game_setup();  //check for snake behaviour
-    clear_screen();// clear screen
- 
-    printf("Snake game, Score %d\n",snake_in_game.length*100);
-    
-    show_board();//print board
-     Sleep(80);
-    if (_kbhit()) {   // check if key pressed
-        read_keyboard();
-    }
-     snake_move(DeltaX, DeltaY);
-    
-}
-snake_move(columns,0);printf("Game Over, Final score: %d\n", snake_in_game.length * 100);
-while(1) getchar();
-    return 0;
+glutInit(&argc,argv);
+glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB);
+glutInitWindowSize(400,400);
 }
