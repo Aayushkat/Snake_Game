@@ -25,7 +25,7 @@ void make_board()//to fill the 1D array which act as a game board
             if (i==0||j==0||i==rows-1||j==columns-1) //to append the # at borders only because it will be at eh ends of the iterations                    
             board[i*columns+j]='#';                  //(i*columns+j) used because the it will force loop to append the characers rows wise 
             else                                      // because i*columns will help skip the previous already elements in the array                      
-            board[i*columns+j]=(is_game_over?' ':'X');                                         
+            board[i*columns+j]=(is_game_over?'X':' ');                                         
         }
     }
 }
@@ -117,7 +117,8 @@ glVertex3f(quad_x_size*(x+1) -1,quad_y_size*((rows-y-1)+1)-1,0.0);
 glVertex3f(quad_x_size*(x+0) -1,quad_y_size*((rows-y-1)+1)-1,0.0);
 glEnd();
             }
-        }glutSwapBuffers();
+        }glFlush();
+        glutSwapBuffers();
 }
  int DeltaX = 0, DeltaY = 0;
  void draw_apples( );
@@ -126,7 +127,8 @@ void read_keyboard(unsigned char key, int x, int y) {
     
 
     switch(key) {
-        case'W':
+ 
+       case'W':
         case 72:
         case 'w':if (( DeltaY!=1)){ DeltaX=0;DeltaY=-1;} break;
         case 80:
@@ -137,19 +139,20 @@ void read_keyboard(unsigned char key, int x, int y) {
         case 'a':if ((DeltaX!=1 )) {DeltaX=-1;DeltaY=0;} break;
         case 'D':
         case 77:
-        case 'd':if ((DeltaX!=-1)) {DeltaX=1;DeltaY=0;} break;         
+        case 'd':if ((DeltaX!=-1)) {DeltaX=1;DeltaY=0;} break;          
     }
     snake_move(DeltaX,DeltaY);
 
 }
 void idleFunc(){
     Sleep(100);
-    
+    make_board();
     draw_apples();
     draw_snake();
     game_setup();
     if(!is_game_over){
-        snake_move(DeltaX,DeltaY);}
+        snake_move(DeltaX,DeltaY);
+    }
         glutPostRedisplay();
     }
     
