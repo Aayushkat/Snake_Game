@@ -13,6 +13,7 @@
 #define apples 99
 char board[rows*columns];//1D to that will become the game board
 int is_game_over=0;// to track if the game is over
+int delta_x=0, delta_y=0;
 unsigned int textureId;
 void clear_screen(){
     //refresh();
@@ -96,6 +97,7 @@ void snake_move(int DirX,int DirY)
 
 void display_function(){
     int x,y;
+    static int last_delta_x=0, last_delta_y=0;
     glClear(GL_COLOR_BUFFER_BIT);
     static struct {
         int x1, y1, x2, y2;
@@ -128,18 +130,41 @@ void display_function(){
     };
         for(y=0;y<rows;y++){
             for(x=0;x<columns;x++){
+                int tileId=0;
                 int ch = board[y*columns+x];
                 float quad_x_size=2/(float)columns;
                 float quad_y_size=2/(float)(rows+logo);
 
                 switch(ch){
-                    case'#':glColor3f(0.5,0.5,0.5);break;
-                    case'0':glColor3f(1.0,0.0,0.0);break;
-                    case'o':glColor3f(1.0,0.0,0.0);break;
-                    case'+':glColor3f(0.0,1.0,0.0);break;
-                    case' ':glColor3f(0.0,0.0,0.0);break;
-                    case'X':glColor3f(0.5,0.5,0.5);break;
-
+                    case'#':tileId = 0;
+                    break;
+                    case'0': if     ( delta_x == 0  && delta_y == -1 ) tileId = 2;
+                    else if( delta_x == 0  && delta_y ==  1 ) tileId = 1;
+                    else if( delta_x == -1 && delta_y ==  0 ) tileId = 3;
+                    else if( delta_x ==  1 && delta_y ==  0 ) tileId = 4;
+                    else tileId = 2;
+                    break;
+                    case '~':
+                    // Dont display during a turn, it looks bad.
+                    if( last_delta_x == delta_x && last_delta_y == delta_y ) {
+                        if     ( delta_x == 0  && delta_y == -1 ) tileId = 6;
+                        else if( delta_x == 0  && delta_y ==  1 ) tileId = 5;
+                        else if( delta_x == -1 && delta_y ==  0 ) tileId = 7;
+                        else if( delta_x ==  1 && delta_y ==  0 ) tileId = 8;
+                        else tileId = 6;
+                    }else{
+                        tileId = 12;
+                    }
+                    last_delta_x = delta_x;
+                    last_delta_y = delta_y;
+                    break;
+                    case'o':tileId = (x+y)%2 ? 9 : 10;break;
+                    case'+':tileId = 11;
+                    break;
+                    case' ':    tileId = 12;
+                    break;
+                    case'X':tileId = 13;
+                    break;
                 }
 glBegin(GL_QUADS);
 glVertex3f(quad_x_size*(x+0) -1,quad_y_size*((rows-y-1)+0)-1,0.0);
@@ -151,9 +176,12 @@ glEnd();
         }glFlush();
         glutSwapBuffers();
 }
- int DeltaX = 0, DeltaY = 0;
+ int delta_x = 0, delta_y = 0;
  void draw_apples( );
 void game_setup( );
+
+
+
 void read_keyboard(unsigned char key, int x, int y) {
     
 
@@ -161,18 +189,18 @@ void read_keyboard(unsigned char key, int x, int y) {
  
        case'W':
         case 72:
-        case 'w':if (( DeltaY!=1)){ DeltaX=0;DeltaY=-1;} break;
+        case 'w':if (( delta_y!=1)){ delta_x=0;delta_y=-1;} break;
         case 80:
         case 'S':
-        case 's':if ((DeltaY!=-1)){ DeltaX=0;DeltaY=1;} break;
+        case 's':if ((delta_y!=-1)){ delta_x=0;delta_y=1;} break;
         case 75:
         case 'A':
-        case 'a':if ((DeltaX!=1 )) {DeltaX=-1;DeltaY=0;} break;
+        case 'a':if ((delta_x!=1 )) {delta_x=-1;delta_y=0;} break;
         case 'D':
         case 77:
-        case 'd':if ((DeltaX!=-1)) {DeltaX=1;DeltaY=0;} break;          
+        case 'd':if ((delta_x!=-1)) {delta_x=1;delta_y=0;} break;          
     }
-    snake_move(DeltaX,DeltaY);
+    snake_move(delta_x,delta_y);
 
 }
 void idleFunc(){
@@ -182,7 +210,7 @@ void idleFunc(){
     draw_snake();
     game_setup();
     if(!is_game_over){
-        snake_move(DeltaX,DeltaY);
+        snake_move(delta_x,delta_y);
     }
         glutPostRedisplay();
     }
