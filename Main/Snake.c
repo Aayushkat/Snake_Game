@@ -4,7 +4,7 @@
 #include <time.h>
 #include <windows.h>
 #include <GL/glut.h>
-#include "git_logo.c"
+#include "snake_tileset.c"
 //#include <ncurses/ncurses.h>
 #define SNAKE_MAX_LEN 256
 #define columns 25
@@ -13,6 +13,7 @@
 #define apples 99
 char board[rows*columns];//1D to that will become the game board
 int is_game_over=0;// to track if the game is over
+int game_over_timeout=0;
 int delta_x=0, delta_y=0;
 unsigned int textureId;
 void clear_screen(){
@@ -159,24 +160,70 @@ void display_function(){
                     last_delta_y = delta_y;
                     break;
                     case'o':tileId = (x+y)%2 ? 9 : 10;break;
+
                     case'+':tileId = 11;
                     break;
-                    case' ':    tileId = 12;
+
+                    case' ':tileId = 12;
                     break;
+
                     case'X':tileId = 13;
                     break;
                 }
 glBegin(GL_QUADS);
-glVertex3f(quad_x_size*(x+0) -1,quad_y_size*((rows-y-1)+0)-1,0.0);
-glVertex3f(quad_x_size*(x+1) -1,quad_y_size*((rows-y-1)+0)-1,0.0);
-glVertex3f(quad_x_size*(x+1) -1,quad_y_size*((rows-y-1)+1)-1,0.0);
-glVertex3f(quad_x_size*(x+0) -1,quad_y_size*((rows-y-1)+1)-1,0.0);
-glEnd();
+glTexCoord2f(tiles[tileId].x1/9(float)snakeTileSet.width,(tiles[tileId].y1)/(float)snakeTileSet.height);
+glVertex3f(quad_x_size*(x+0)-1,quad_y_size*((rows-y-1)+0)-1,0.0);
+glTexCoord2f(tiles[tileId].x2/(float)snakeTileSet.width, (tiles[tileId].y1)/(float)snakeTileSet.height);
+glVertex3f(quad_x_size * (x+1) -1, quad_y_size * ((rows-y-1)+0) -1, 0.0);
+glTexCoord2f(tiles[tileId].x2/(float)snakeTileSet.width, (tiles[tileId].y2)/(float)snakeTileSet.height);
+glVertex3f(quad_y_size * (x+1) -1, quad_y_size * ((rows-y-1)+1) -1, 0.0);
+glTexCoord2f(tiles[tileId].x1/(float)snakeTileSet.width, (tiles[tileId].y2)/(float)snakeTileSet.height);
+glVertex3f(quad_x_size * (x+0) -1, quad_y_size * ((rows-y-1)+1) -1, 0.0);
+            glEnd();
+
             }
-        }glFlush();
+        }
+            // Draw logo
+    {
+        int tileId = 14;
+        glBegin(GL_QUADS);
+            glTexCoord2f(tiles[tileId].x1/(float)snakeTileSet.width, (tiles[tileId].y1)/(float)snakeTileSet.height);
+            glVertex3f(-1, 1.0, 0);
+            glTexCoord2f(tiles[tileId].x2/(float)snakeTileSet.width, (tiles[tileId].y1)/(float)snakeTileSet.height);
+            glVertex3f( 1, 1.0, 0);
+            glTexCoord2f(tiles[tileId].x2/(float)snakeTileSet.width, (tiles[tileId].y2)/(float)snakeTileSet.height);
+            glVertex3f( 1, 0.51, 0);
+            glTexCoord2f(tiles[tileId].x1/(float)snakeTileSet.width, (tiles[tileId].y2)/(float)snakeTileSet.height);
+            glVertex3f(-1, 0.51, 0);
+        glEnd();
+    }
+    
+    // Draw score
+    {
+        int i;
+        int score = (snake.length-1) * 100;
+        for(i=0; i<5; i++) {
+            int digit = score - ((score / 10) * 10);
+            int tileId = 15 + digit;
+            score /= 10;
+            glBegin(GL_QUADS);
+                glTexCoord2f(tiles[tileId].x1/(float)snakeTileSet.width, (tiles[tileId].y1)/(float)snakeTileSet.height);
+                glVertex3f( 0.05+(4-i)*0.17, 0.75, 0);
+                glTexCoord2f(tiles[tileId].x2/(float)snakeTileSet.width, (tiles[tileId].y1)/(float)snakeTileSet.height);
+                glVertex3f( 0.20+(4-i)*0.17, 0.75, 0);
+                glTexCoord2f(tiles[tileId].x2/(float)snakeTileSet.width, (tiles[tileId].y2)/(float)snakeTileSet.height);
+                glVertex3f( 0.20+(4-i)*0.17, 0.60, 0);
+                glTexCoord2f(tiles[tileId].x1/(float)snakeTileSet.width, (tiles[tileId].y2)/(float)snakeTileSet.height);
+                glVertex3f( 0.05+(4-i)*0.17, 0.60, 0);
+            glEnd();
+        }
+    }
+        
+        glFlush();
         glutSwapBuffers();
 }
- int delta_x = 0, delta_y = 0;
+
+ 
  void draw_apples( );
 void game_setup( );
 
@@ -203,19 +250,31 @@ void read_keyboard(unsigned char key, int x, int y) {
     snake_move(delta_x,delta_y);
 
 }
-void idleFunc(){
-    Sleep(100);
-    make_board();
-    draw_apples();
-    draw_snake();
-    game_setup();
-    if(!is_game_over){
-        snake_move(delta_x,delta_y);
-    }
-        glutPostRedisplay();
-    }
-    
 
+void setup() {
+    delta_x = 0;
+    delta_y = 0;
+    is_game_over = 0;
+    game_over_timeout = 60;
+    setup_food();
+    setup_snake();
+    fill_board();
+    draw_food();
+    draw_snake();
+}
+
+void idleFunc(){
+if (is_game_over){
+    Sleep(1000/10.0);
+    game_over_timeout--;
+    if (game_over_timeout==0){
+        setup();
+    }
+}
+
+
+
+}
 void draw_apples(){
     int i;
     for(i=0;i<apples;i++){
