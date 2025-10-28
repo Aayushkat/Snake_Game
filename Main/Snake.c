@@ -96,7 +96,75 @@ void snake_move(int DirX,int DirY)
     snake_in_game.Part[0].y+=DirY;
 }
 
-void display_function(){
+
+
+ 
+void draw_apples( );
+void game_setup( );
+
+
+
+void read_keyboard(unsigned char key, int x, int y) {
+    
+
+    switch(key) {
+ 
+       case'W':
+        case 72:
+        case 'w':if (( delta_y!=1)){ delta_x=0;delta_y=-1;} break;
+        case 80:
+        case 'S':
+        case 's':if ((delta_y!=-1)){ delta_x=0;delta_y=1;} break;
+        case 75:
+        case 'A':
+        case 'a':if ((delta_x!=1 )) {delta_x=-1;delta_y=0;} break;
+        case 'D':
+        case 77:
+        case 'd':if ((delta_x!=-1)) {delta_x=1;delta_y=0;} break;          
+    }
+    snake_move(delta_x,delta_y);
+
+}
+void setup_snake(){
+    snake_in_game.length=1;
+    snake_in_game.Part[0].x=1+rand()%(columns-2);
+    snake_in_game.Part[0].y=1+rand()%(rows-2);
+}
+void draw_apples(){
+    int i;
+    for(i=0;i<apples;i++){
+        if(!apple_in_game[i].eaten)
+        board[apple_in_game[i].y*columns+apple_in_game[i].x]='+';
+    }
+}
+void setup_apple()
+{
+    int i;
+    for (i=0;i<apples;i++){
+    apple_in_game[i].x=1+rand()%(columns-2);
+    apple_in_game[i].y=1+rand()%(rows-2);
+    apple_in_game[i].eaten=0;
+}}
+void game_setup(){
+    int i;
+    for (i=0;i<apples;i++){//check whether snake collided/eaten the apple with its head
+        if(!apple_in_game[i].eaten){
+            if((apple_in_game[i].x==snake_in_game.Part[0].x)&&(apple_in_game[i].y==snake_in_game.Part[0].y)){
+             apple_in_game[i].eaten=1;
+             snake_in_game.length++;}
+        }
+
+    }//check collision with the wall
+    if(snake_in_game.Part[0].x==0||snake_in_game.Part[0].x==columns-1||snake_in_game.Part[0].y==0||snake_in_game.Part[0].y==rows-1){
+    is_game_over=1;}
+
+    for(i=1;i<snake_in_game.length;i++){//check the collision with itself
+        if(snake_in_game.Part[0].x==snake_in_game.Part[i].x&&snake_in_game.Part[0].y==snake_in_game.Part[i].y){
+        is_game_over=1;}
+
+    }   
+}
+ void display_function(){
     int x,y;
     static int last_delta_x=0, last_delta_y=0;
     glClear(GL_COLOR_BUFFER_BIT);
@@ -223,42 +291,15 @@ glVertex3f(quad_x_size * (x+0) -1, quad_y_size * ((rows-y-1)+1) -1, 0.0);
         glutSwapBuffers();
 }
 
- 
- void draw_apples( );
-void game_setup( );
-
-
-
-void read_keyboard(unsigned char key, int x, int y) {
-    
-
-    switch(key) {
- 
-       case'W':
-        case 72:
-        case 'w':if (( delta_y!=1)){ delta_x=0;delta_y=-1;} break;
-        case 80:
-        case 'S':
-        case 's':if ((delta_y!=-1)){ delta_x=0;delta_y=1;} break;
-        case 75:
-        case 'A':
-        case 'a':if ((delta_x!=1 )) {delta_x=-1;delta_y=0;} break;
-        case 'D':
-        case 77:
-        case 'd':if ((delta_x!=-1)) {delta_x=1;delta_y=0;} break;          
-    }
-    snake_move(delta_x,delta_y);
-
-}
 
 void setup() {
     delta_x = 0;
     delta_y = 0;
     is_game_over = 0;
     game_over_timeout = 60;
-    setup_food();
+    setup_apple();
     setup_snake();
-    fill_board();
+    make_board();
     draw_food();
     draw_snake();
 }
@@ -270,54 +311,25 @@ if (is_game_over){
     if (game_over_timeout==0){
         setup();
     }
+    make_board();
+    draw_apples();
+    draw_snake();
+
+}else{
+    Sleep(1000/(7+(snake_in_game.length/(float)apples)*10.0));
+    
 }
 
 
 
 }
-void draw_apples(){
-    int i;
-    for(i=0;i<apples;i++){
-        if(!apple_in_game[i].eaten)
-        board[apple_in_game[i].y*columns+apple_in_game[i].x]='+';
-    }
-}
 
-void setup_apple()
-{
-    int i;
-    for (i=0;i<apples;i++){
-    apple_in_game[i].x=1+rand()%(columns-2);
-    apple_in_game[i].y=1+rand()%(rows-2);
-    apple_in_game[i].eaten=0;
-}}
 
-void setup_snake(){
-    snake_in_game.length=1;
-    snake_in_game.Part[0].x=1+rand()%(columns-2);
-    snake_in_game.Part[0].y=1+rand()%(rows-2);
-}
 
-void game_setup(){
-    int i;
-    for (i=0;i<apples;i++){//check whether snake collided/eaten the apple with its head
-        if(!apple_in_game[i].eaten){
-            if((apple_in_game[i].x==snake_in_game.Part[0].x)&&(apple_in_game[i].y==snake_in_game.Part[0].y)){
-             apple_in_game[i].eaten=1;
-             snake_in_game.length++;}
-        }
 
-    }//check collision with the wall
-    if(snake_in_game.Part[0].x==0||snake_in_game.Part[0].x==columns-1||snake_in_game.Part[0].y==0||snake_in_game.Part[0].y==rows-1){
-    is_game_over=1;}
 
-    for(i=1;i<snake_in_game.length;i++){//check the collision with itself
-        if(snake_in_game.Part[0].x==snake_in_game.Part[i].x&&snake_in_game.Part[0].y==snake_in_game.Part[i].y){
-        is_game_over=1;}
 
-    }   
-}
- 
+
 int main(int argc, char **argv){
 srand(time(0));//Seed the pseudo-random number generator with the current time.
                 // Without this, rand() would produce the same sequence every run, 
