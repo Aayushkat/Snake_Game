@@ -11,15 +11,12 @@
 #define logo 8
 #define rows 25
 #define apples 99
-char board[rows*columns];//1D to that will become the game board
+char board[columns*rows];//1D to that will become the game board
 int is_game_over=0;// to track if the game is over
 int game_over_timeout=0;
 int delta_x=0, delta_y=0;
 unsigned int textureId;
-void clear_screen(){
-    //refresh();
-    system("cls");// the cls is onlyused for windows so for linux or mac make use clear command
-}
+ 
 void make_board()//to fill the 1D array which act as a game board
 {
 
@@ -104,27 +101,7 @@ void game_setup( );
 
 
 
-void read_keyboard(unsigned char key, int x, int y) {
-    
 
-    switch(key) {
- 
-       case'W':
-        case 72:
-        case 'w':if (( delta_y!=1)){ delta_x=0;delta_y=-1;} break;
-        case 80:
-        case 'S':
-        case 's':if ((delta_y!=-1)){ delta_x=0;delta_y=1;} break;
-        case 75:
-        case 'A':
-        case 'a':if ((delta_x!=1 )) {delta_x=-1;delta_y=0;} break;
-        case 'D':
-        case 77:
-        case 'd':if ((delta_x!=-1)) {delta_x=1;delta_y=0;} break;          
-    }
-    snake_move(delta_x,delta_y);
-
-}
 void setup_snake(){
     snake_in_game.length=1;
     snake_in_game.Part[0].x=1+rand()%(columns-2);
@@ -171,17 +148,17 @@ void game_setup(){
     static struct {
         int x1, y1, x2, y2;
     } tiles[] = {
-    { 24, 16,  31, 23 }, // '#' Wall
-        {  8, 24,  15, 33 }, // '0' Up
-        {  0, 16,   7, 23 }, // '0' Down
-        {  8,  8,  15, 15 }, // '0' Left
-        {  0,  0,   7,  7 }, // '0' Right
+        { 24, 16,  31, 23 }, // '#' Wall
+        {  8, 24,  15, 33 }, // '@' Up
+        {  0, 16,   7, 23 }, // '@' Down
+        {  8,  8,  15, 15 }, // '@' Left
+        {  0,  0,   7,  7 }, // '@' Right
         {  8, 16,  15, 23 }, // '~' Up
         {  0, 24,   7, 33 }, // '~' Down
         {  0,  8,   7, 15 }, // '~' Left
         {  8,  0,  15,  7 }, // '~' Right
-        { 16,  0,  23,  7 }, // 'o' Snake Body 1
-        { 24,  0,  31,  7 }, // 'o' Snake Body 2
+        { 16,  0,  23,  7 }, // '*' Snake Body 1
+        { 24,  0,  31,  7 }, // '*' Snake Body 2
         { 16, 16,  23, 23 }, // '+' Snake Food
         {  0, 32,   7, 39 }, // ' ' Empty
         { 24, 16,  31, 23 }, // 'X' Game Over tile
@@ -239,12 +216,12 @@ void game_setup(){
                     break;
                 }
 glBegin(GL_QUADS);
-glTexCoord2f(tiles[tileId].x1/9(float)snakeTileSet.width,(tiles[tileId].y1)/(float)snakeTileSet.height);
+glTexCoord2f(tiles[tileId].x1/(float)snakeTileSet.width,(tiles[tileId].y1)/(float)snakeTileSet.height);
 glVertex3f(quad_x_size*(x+0)-1,quad_y_size*((rows-y-1)+0)-1,0.0);
 glTexCoord2f(tiles[tileId].x2/(float)snakeTileSet.width, (tiles[tileId].y1)/(float)snakeTileSet.height);
 glVertex3f(quad_x_size * (x+1) -1, quad_y_size * ((rows-y-1)+0) -1, 0.0);
 glTexCoord2f(tiles[tileId].x2/(float)snakeTileSet.width, (tiles[tileId].y2)/(float)snakeTileSet.height);
-glVertex3f(quad_y_size * (x+1) -1, quad_y_size * ((rows-y-1)+1) -1, 0.0);
+glVertex3f(quad_x_size * (x+1) -1, quad_y_size * ((rows-y-1)+1) -1, 0.0);
 glTexCoord2f(tiles[tileId].x1/(float)snakeTileSet.width, (tiles[tileId].y2)/(float)snakeTileSet.height);
 glVertex3f(quad_x_size * (x+0) -1, quad_y_size * ((rows-y-1)+1) -1, 0.0);
             glEnd();
@@ -269,7 +246,7 @@ glVertex3f(quad_x_size * (x+0) -1, quad_y_size * ((rows-y-1)+1) -1, 0.0);
     // Draw score
     {
         int i;
-        int score = (snake.length-1) * 100;
+        int score = (snake_in_game.length-1) * 100;
         for(i=0; i<5; i++) {
             int digit = score - ((score / 10) * 10);
             int tileId = 15 + digit;
@@ -300,7 +277,7 @@ void setup() {
     setup_apple();
     setup_snake();
     make_board();
-    draw_food();
+    draw_apples();
     draw_snake();
 }
 
@@ -317,40 +294,97 @@ if (is_game_over){
 
 }else{
     Sleep(1000/(7+(snake_in_game.length/(float)apples)*10.0));
+    make_board();
+    draw_apples();
+    draw_snake();
+    game_setup();
+    snake_move(delta_x,delta_y);
+
+}
+glutPostRedisplay();
+
+
+}
+
+void read_keyboard(unsigned char key, int x, int y) {
+    if (!is_game_over){
+        switch(key) {
+ 
+       case'W':
+        case 72:
+        case 'w':delta_x =  0; delta_y = -1; break;
+        case 80:
+        case 'S':
+        case 's': delta_x =  0; delta_y =  1; break;
+        case 75:
+        case 'A':
+        case 'a': delta_x = -1; delta_y =  0; break;
+        case 'D':
+        case 77:
+        case 'd': delta_x =  1; delta_y =  0; break;           
+    }}
+    switch (key)
+    {
+    case 'r':
+        setup();    
+        break;
+    }
+
     
 }
-
-
-
+void specialFunc(int key, int x, int y) {
+    if(!is_game_over) {
+        switch(key) {
+            case GLUT_KEY_UP:    read_keyboard('w', x, y); break;
+            case GLUT_KEY_DOWN:  read_keyboard('s', x, y); break;
+            case GLUT_KEY_LEFT:  read_keyboard('a', x, y); break;
+            case GLUT_KEY_RIGHT: read_keyboard('d', x, y); break;
+        }
+    }
 }
 
-
+void init() {
+    glEnable(GL_TEXTURE_2D);
+        
+    glBindTexture(GL_TEXTURE_2D, textureId);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    
+    glGenTextures(1, &textureId);
+    
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, snakeTileSet.width, snakeTileSet.height, 0, GL_RGB, GL_UNSIGNED_BYTE, snakeTileSet.pixel_data);
+}
 
 
 
 
 
 int main(int argc, char **argv){
-srand(time(0));//Seed the pseudo-random number generator with the current time.
-                // Without this, rand() would produce the same sequence every run, 
-                // making the game predictable and boring.
-    //initscr();
-    //noecho();
-    make_board();
-setup_snake();//place snake randomly
-setup_apple();//place apple randomly
-glutInit(&argc,argv);
-glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB);
-glutInitWindowSize(400,400);
-glutCreateWindow("Snake Game");
+   
+    srand(time(0));
+    
+    setup();
+    
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+    glutInitWindowSize(columns*16, (rows+logo)*16);
+    glutCreateWindow("Danger rope food hope");
+    
+    init();
+    
+    glutDisplayFunc(display_function);
+    glutKeyboardFunc(read_keyboard);
+    glutSpecialFunc(specialFunc);
+    glutIdleFunc(idleFunc);
 
-glutDisplayFunc(display_function);
-glutKeyboardFunc(read_keyboard);
-glutIdleFunc(idleFunc);
-glClearColor(0.0,0.0,0.0,0.1);
-glutMainLoop();
-return 0;
+    glutMainLoop();
+    
+    glDeleteTextures(1, &textureId);
+    
+    return 0;
 }
 
 //compile it using 
-//gcc main.c -o final -lfreeglut -lopengl32 -lglu32 -lwinmm -lgdi32
+//gcc Snake.c -o final -lfreeglut -lopengl32 -lglu32 -lwinmm -lgdi32
