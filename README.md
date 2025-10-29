@@ -92,7 +92,7 @@ Score = (snake length - 1) × 100
 Displayed at the top of the screen
 
 ---
-# 💡 Future Improvements
+## 💡 Future Improvements
 
 ### 🔊 Add sound effects
 
