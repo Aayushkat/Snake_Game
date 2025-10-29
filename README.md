@@ -1,92 +1,105 @@
-Classic Snake Game
+# 🐍 Snake Game in C (OpenGL + FreeGLUT)
 
-This is a classic Snake game implementation developed in C, utilizing the OpenGL Utility Toolkit (GLUT) for graphics rendering and a console-based approach for game logic management.
+A simple yet visually enhanced **Snake Game** written in **C**, using **OpenGL** and **FreeGLUT** for graphics rendering.  
+This project demonstrates core game logic, rendering pipelines, keyboard input handling, and texture mapping — all built from scratch.
 
-The game features a fixed-size grid, wall and self-collision detection, and score tracking based on the snake's length.
+---
 
-🚀 Features
+## 🎮 Game Overview
 
-Grid-Based Movement: Smooth movement of the snake across a defined grid.
+Control a snake to eat apples (`+`) that appear randomly on the board.  
+Each apple increases the snake’s length and score.  
+The game ends if the snake collides with a wall or itself.  
+After a short pause, the game automatically restarts.
 
-Collision Detection: Checks for collision with the boundary walls and with the snake's own body.
+---
 
-Real-time Graphics: Uses OpenGL and GLUT to render the game world with tiled graphics.
+## 🧠 Features
 
-Scoring System: Score increases as the snake eats apples.
+- 🟩 Fully coded in **C**
+- 🧩 Uses **OpenGL** and **FreeGLUT**
+- 🍎 Random apple generation
+- 🐍 Snake growth logic
+- 💥 Wall & self-collision detection
+- 🔁 Auto restart on game over
+- 🎨 Textured graphics via `snake_tileset.c`
 
-Game Over/Restart: Automatic game restart after a short timeout following a game over event.
+---
 
-Input Handling: Supports both W/A/S/D and Arrow Keys for movement.
+## 🛠️ Requirements
 
-🛠️ Dependencies
+### 🔹 Windows
+- **MinGW** or **TDM-GCC** compiler  
+- **FreeGLUT** development library  
+- **OpenGL** (`opengl32`, `glu32`, `gdi32`, `winmm`)
 
-To compile and run this project, you need a C compiler (like GCC) and the following graphics libraries:
+---
 
-OpenGL / GLU
+## ⚙️ Compilation & Execution
 
-FreeGLUT (or standard GLUT)
+### 🧩 Step 1 — Compile:
+```bash
+gcc Snake.c -o snake_game -lfreeglut -lopengl32 -lglu32 -lwinmm -lgdi32
+```
 
-Windows API Libraries (winmm and gdi32 are required for the Windows functions used, like Sleep).
-
-snake_tileset.c: This project relies on a file named snake_tileset.c which contains the texture/pixel data for rendering the game tiles. This file must be present in the project directory.
-
-⚙️ Getting Started
-
-Prerequisites
-
-Ensure you have a C development environment (like MinGW or Visual Studio with GCC/G++) and the FreeGLUT library installed on your system.
-
-Compilation
-
-You can compile the game using the following command, as indicated in the source code comments. This command links the necessary libraries:
-
-# Assuming your main file is named 'Snake.c'
-gcc Snake.c -o final -lfreeglut -lopengl32 -lglu32 -lwinmm -lgdi32
-
-
-Running the Game
-
-After successful compilation, run the generated executable:
-
-./final
+# ⌨️ Controls
+| Key       | Action       |
+| --------- | ------------ |
+| **W / ↑** | Move Up      |
+| **S / ↓** | Move Down    |
+| **A / ←** | Move Left    |
+| **D / →** | Move Right   |
+| **R**     | Restart Game |
 
 
-🎮 How to Play
+---
 
-Controls
+# 🧱 How It Works
+🕹️ Board Setup
 
-The snake's movement can be controlled using two sets of keys:
+The 1D array board[] represents the game grid.
 
-Action
+Borders (#) are generated during setup.
 
-Keyboard Key
+## 🐍 Snake
 
-Move Up
+Defined by struct Snake, containing:
 
-W or Up Arrow
+length of the snake
 
-Move Down
+Array of body coordinates (x, y)
 
-S or Down Arrow
+ ## 🍎 Apples
 
-Move Left
+Defined by struct Apple, each with:
 
-A or Left Arrow
+Position (x, y)
 
-Move Right
+Eaten state
 
-D or Right Arrow
+## 🎨 Rendering
 
-Restart Game
+Uses OpenGL quads for each tile (snake, walls, apples).
 
-R
+Tiles are mapped from the included snake_tileset.c.
 
-Game Objective
+## 🏆 Scoring
 
-Guide the snake to eat the Apples (+ symbol).
+Each apple eaten = +100 points
 
-Each apple eaten increases the snake's length and your score.
+Score = (snake length - 1) × 100
 
-Avoid hitting the Walls (# symbol) or the Snake's own body.
+Displayed at the top of the screen
 
-Hitting a wall or the snake's body results in a Game Over.
+---
+### 💡 Future Improvements
+
+### 🔊 Add sound effects
+
+### ⚙️ Add difficulty levels
+
+### 🏁 Create a start menu or pause feature
+
+### 💾 Save high scores to file
+
+### 🐧 Port to Linux/macOS using SDL2 or GLFW
