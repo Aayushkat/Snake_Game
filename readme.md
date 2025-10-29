@@ -40,9 +40,9 @@ After a short pause, the game automatically restarts.
 ### 🧩 Step 1 — Compile:
 ```bash
 gcc Snake.c -o snake_game -lfreeglut -lopengl32 -lglu32 -lwinmm -lgdi32
+```
 
-
-⌨️ Controls
+# ⌨️ Controls
 | Key       | Action       |
 | --------- | ------------ |
 | **W / ↑** | Move Up      |
@@ -54,14 +54,14 @@ gcc Snake.c -o snake_game -lfreeglut -lopengl32 -lglu32 -lwinmm -lgdi32
 
 ---
 
-🧱 How It Works
+# 🧱 How It Works
 🕹️ Board Setup
 
 The 1D array board[] represents the game grid.
 
 Borders (#) are generated during setup.
 
-🐍 Snake
+## 🐍 Snake
 
 Defined by struct Snake, containing:
 
@@ -69,7 +69,7 @@ length of the snake
 
 Array of body coordinates (x, y)
 
-🍎 Apples
+ ## 🍎 Apples
 
 Defined by struct Apple, each with:
 
@@ -77,13 +77,13 @@ Position (x, y)
 
 Eaten state
 
-🎨 Rendering
+## 🎨 Rendering
 
 Uses OpenGL quads for each tile (snake, walls, apples).
 
 Tiles are mapped from the included snake_tileset.c.
 
-🏆 Scoring
+## 🏆 Scoring
 
 Each apple eaten = +100 points
 
@@ -91,14 +91,15 @@ Score = (snake length - 1) × 100
 
 Displayed at the top of the screen
 
-💡 Future Improvements
+---
+### 💡 Future Improvements
 
-🔊 Add sound effects
+### 🔊 Add sound effects
 
-⚙️ Add difficulty levels
+### ⚙️ Add difficulty levels
 
-🏁 Create a start menu or pause feature
+### 🏁 Create a start menu or pause feature
 
-💾 Save high scores to file
+### 💾 Save high scores to file
 
-🐧 Port to Linux/macOS using SDL2 or GLFW
+### 🐧 Port to Linux/macOS using SDL2 or GLFW
