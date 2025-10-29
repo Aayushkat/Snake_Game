@@ -1,4 +1,104 @@
-🐍 Classic Snake Game (OpenGL/GLUT)Welcome to the repository for a classic Snake game implementation, built in C using the OpenGL Utility Toolkit (GLUT) for rendering.This project focuses on implementing robust game logic within a console application framework, while utilizing the power of OpenGL for visual output.✨ Features HighlightThe game provides a smooth, tile-based experience with key functionality:Grid-Based Movement: Fluid control across a $25 \times 25$ grid.Intelligent Collision: Checks for game-ending collisions with the boundary walls and the snake's own body.Real-time Graphics: Renders the game world using OpenGL and a custom tile set.Dynamic Scoring: Score increases as the snake consumes apples ($+$), with faster movement as the snake grows.Automatic Restart: Implements a brief timeout after game over, followed by an automatic reset for quick re-playability.Dual Input Support: Accepts both W/A/S/D and standard Arrow Keys for player movement.🛠️ Build & Setup InstructionsDependenciesTo successfully compile this game, you must have the following libraries installed and linked on your system:C Compiler (GCC/MinGW)FreeGLUT (Graphics Utility Toolkit)OpenGL / GLUWindows Libraries (winmm, gdi32 for timer and system functions)snake_tileset.c (The custom asset file for the game's graphics, which must be present in the same directory as the main C file).Compilation CommandUse the following command in your terminal to compile the source file (Snake.c) and link all required libraries:# Compile and link for a Windows environment
-gcc Snake.c -o final -lfreeglut -lopengl32 -lglu32 -lwinmm -lgdi32
-Running the ExecutableExecute the generated file:./final
-🎮 How to PlayControlsActionKeyboard KeyMove UpW or Up ArrowMove DownS or Down ArrowMove LeftA or Left ArrowMove RightD or Right ArrowRestart GameR (Anytime)Game Over ConditionsThe game ends immediately if the snake's head (0) collides with:The Walls (#)Its Own Body (o)
+# 🐍 Snake Game in C (OpenGL + FreeGLUT)
+
+A simple yet visually enhanced **Snake Game** written in **C**, using **OpenGL** and **FreeGLUT** for graphics rendering.  
+This project demonstrates core game logic, rendering pipelines, keyboard input handling, and texture mapping — all built from scratch.
+
+---
+
+## 🎮 Game Overview
+
+Control a snake to eat apples (`+`) that appear randomly on the board.  
+Each apple increases the snake’s length and score.  
+The game ends if the snake collides with a wall or itself.  
+After a short pause, the game automatically restarts.
+
+---
+
+## 🧠 Features
+
+- 🟩 Fully coded in **C**
+- 🧩 Uses **OpenGL** and **FreeGLUT**
+- 🍎 Random apple generation
+- 🐍 Snake growth logic
+- 💥 Wall & self-collision detection
+- 🔁 Auto restart on game over
+- 🎨 Textured graphics via `snake_tileset.c`
+
+---
+
+## 🛠️ Requirements
+
+### 🔹 Windows
+- **MinGW** or **TDM-GCC** compiler  
+- **FreeGLUT** development library  
+- **OpenGL** (`opengl32`, `glu32`, `gdi32`, `winmm`)
+
+---
+
+## ⚙️ Compilation & Execution
+
+### 🧩 Step 1 — Compile:
+```bash
+gcc Snake.c -o snake_game -lfreeglut -lopengl32 -lglu32 -lwinmm -lgdi32
+
+
+⌨️ Controls
+| Key       | Action       |
+| --------- | ------------ |
+| **W / ↑** | Move Up      |
+| **S / ↓** | Move Down    |
+| **A / ←** | Move Left    |
+| **D / →** | Move Right   |
+| **R**     | Restart Game |
+
+
+---
+
+🧱 How It Works
+🕹️ Board Setup
+
+The 1D array board[] represents the game grid.
+
+Borders (#) are generated during setup.
+
+🐍 Snake
+
+Defined by struct Snake, containing:
+
+length of the snake
+
+Array of body coordinates (x, y)
+
+🍎 Apples
+
+Defined by struct Apple, each with:
+
+Position (x, y)
+
+Eaten state
+
+🎨 Rendering
+
+Uses OpenGL quads for each tile (snake, walls, apples).
+
+Tiles are mapped from the included snake_tileset.c.
+
+🏆 Scoring
+
+Each apple eaten = +100 points
+
+Score = (snake length - 1) × 100
+
+Displayed at the top of the screen
+
+💡 Future Improvements
+
+🔊 Add sound effects
+
+⚙️ Add difficulty levels
+
+🏁 Create a start menu or pause feature
+
+💾 Save high scores to file
+
+🐧 Port to Linux/macOS using SDL2 or GLFW
