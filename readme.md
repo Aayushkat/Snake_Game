@@ -102,4 +102,4 @@ Displayed at the top of the screen
 
 ### 💾 Save high scores to file
 
-### 🐧 Port to Linux/macOS using SDL2 or GLFW
+### 🐧 Port to Linux
