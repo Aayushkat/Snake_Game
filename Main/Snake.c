@@ -1,9 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <conio.h>
 #include <time.h>
+#ifdef __APPLE__
+#include <GLUT/glut.h>
+#include "mac_compat.h"
+#else
+#include <conio.h>
 #include <windows.h>
 #include <GL/glut.h>
+#endif
 #include "snake_tileset.c"
 //#include <ncurses/ncurses.h>
 #define SNAKE_MAX_LEN 256
